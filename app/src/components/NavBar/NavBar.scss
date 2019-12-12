@@ -1,0 +1,46 @@
+@import '../App/variables';
+
+$sz-navbar-height: 4.8rem;
+$cl-navbar-background: $cl-white;
+
+.app-navigation {
+  position: fixed;
+  bottom: 0%;
+  display: block;
+  width: 100%;
+  height: $sz-navbar-height;
+  background-color: $cl-navbar-background;
+  box-shadow: 0px -4px 8px transparentize($cl-foreground, .9);
+}
+
+ul {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100%;
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 0;
+  }
+
+  svg {
+    width: 2.4rem;
+    height: 2.4rem;
+    margin-bottom: .3rem;
+
+    path {
+      fill: $cl-foreground;
+    }
+  }
+
+  span {
+    font-size: 1.2rem;
+    color: $cl-foreground;
+  }
+}
