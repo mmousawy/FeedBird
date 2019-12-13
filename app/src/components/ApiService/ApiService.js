@@ -1,21 +1,16 @@
-import { useContext } from 'react';
-import { AppContext } from '../../contexts/AppContext/AppContext';
+import React, { useContext } from 'react';
+import SplashScreen from '../SplashScreen/SplashScreen';
+import { ApiContext } from '../../state/ApiContext';
 
 export default function ApiService(props) {
-  const testContext = useContext(AppContext);
+  const state = useContext(ApiContext);
 
-  let socket = null;
-  const webSocketUrl = props.url || 'ws://localhost:8080';
-
-  socket = new WebSocket(webSocketUrl);
-
-  socket.onopen = function(e) {
-    // Connection established
-    console.log('connection made!');
-    console.log(testContext);
-  };
-
-  return null;
+  return (
+    state.connected
+      ? props.children
+      : <SplashScreen></SplashScreen>
+  );
+}
 
   // function connect()
   // {
@@ -46,7 +41,6 @@ export default function ApiService(props) {
   //     socket.send(payload);
   //   }
   // }
-}
 
 // export class ApiPayload
 // {
