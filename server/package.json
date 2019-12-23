@@ -9,6 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "graphql-iso-date": "^3.6.1",
+    "sqlite3": "^4.1.1",
     "ws": "^7.2.0"
+  },
+  "devDependencies": {
+    "graphql": "^14.5.8"
   }
 }

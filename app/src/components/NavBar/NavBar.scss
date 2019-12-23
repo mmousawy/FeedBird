@@ -23,10 +23,15 @@ ul {
   list-style: none;
 
   li {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 0;
+    display: block;
+    width: 4.1rem;
+
+    a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+    }
   }
 
   svg {

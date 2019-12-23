@@ -10,7 +10,6 @@ export default function SplashScreen(props) {
     <div className="splash-screen">
       <div className="splash-screen__content">
         <SVG src={imgLogo} />
-        <h2>Loading FeedBird</h2>
       </div>
     </div>
   );
