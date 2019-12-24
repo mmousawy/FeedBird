@@ -13,7 +13,7 @@ export default class Posts extends React.Component {
     super(props);
 
     this.state = {
-      posts: []
+      posts: null
     };
   }
 
@@ -39,7 +39,11 @@ export default class Posts extends React.Component {
         schema: 'post',
         query: `{
           posts {
-            title
+            title,
+            source_provider,
+            description,
+            url,
+            date
           }
         }`,
         id: prevState.subscriptionId
@@ -59,6 +63,7 @@ export default class Posts extends React.Component {
 
   parsePosts(data)
   {
+    console.log(data);
     this.setState(prevState => {
       prevState.posts = data.posts;
 
@@ -76,7 +81,7 @@ export default class Posts extends React.Component {
       <main className="posts">
         <React.Fragment>
           {
-            this.state.posts.length > 0
+            this.state.posts && this.state.posts.length > 0
               ? (this.state.posts.map((post, index) => {
                   return <PostItem data={ post } key={ index } />;
                 }))

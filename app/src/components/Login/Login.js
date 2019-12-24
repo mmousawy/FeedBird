@@ -27,9 +27,9 @@ export default class Login extends Component
 
   componentDidMount()
   {
-    // Subscribe to users namespace
+    // Set up subscription ID for current component
     this.setState(prevState => {
-      prevState.subscriptionId = this.context.subscribe('users', 'authUser', this.parseAuth.bind(this));
+      prevState.subscriptionId = this.context.subscribe(this.parseAuth.bind(this));
 
       return prevState;
     });
@@ -56,14 +56,15 @@ export default class Login extends Component
 
   parseAuth(newData)
   {
-    if (!newData.token) {
+    console.log(newData);
+    if (!newData.auth) {
       return;
     }
 
-    window.localStorage.setItem('authToken', newData.token);
+    window.localStorage.setItem('authToken', newData.auth.token);
 
     this.context.setState(prevState => {
-      prevState.authToken = newData.token;
+      prevState.authToken = newData.auth.token;
       prevState.authenticated = true;
     });
 
@@ -78,10 +79,22 @@ export default class Login extends Component
 
   submitForm(event)
   {
-    // Request recent posts
-    const payload = new ApiPayload('users', 'authUser', {
-      email: this.state.email,
-      password: this.state.password
+    // Attempt login
+    const payload = new ApiPayload({
+      schema: 'user',
+      query: `{
+        auth {
+          uid,
+          firstname,
+          lastname,
+          token
+        }
+      }`,
+      data: {
+        email: this.state.email,
+        password: this.state.password
+      },
+      id: this.state.subscriptionId
     });
 
     this.context.send(payload.pack());

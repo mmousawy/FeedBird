@@ -1,18 +1,12 @@
 const WebSocket = require('ws');
 const { graphql } = require('graphql');
 const Database = require('./modules/Database');
-// const Users = require('./services/UsersService');
-// const Posts = require('./services/PostsService');
+const Harvester = require('./modules/Harvester');
 
 const database = new Database();
+const harvester = new Harvester(database);
 
-graphql(database.schemas['post'], `{
-  posts {
-    title
-  }
-}`).then(result => {
-  console.log(result);
-});
+// harvester.harvest('http://feeds.feedburner.com/tweakers/mixed');
 
 const wss = new WebSocket.Server({ port: 8080 });
 
@@ -22,10 +16,16 @@ wss.on('connection', function connection(ws) {
 
     const schema = parsedMessage['schema'];
     const query = parsedMessage['query'];
+    const data = parsedMessage['data'];
     const id = parsedMessage['id'];
 
+    if (!database.schemas[schema]) {
+      console.error(`Schema "${schema}" is not recognized.`);
+      return;
+    }
+
     // Get data through GraphQL API
-    graphql(database.schemas[schema], query).then(result => {
+    graphql(database.schemas[schema], query, data).then(result => {
       // Send result back to connection
       ws.send(new ApiPayload(id, result.data).pack());
     });

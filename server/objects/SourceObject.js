@@ -1,14 +1,11 @@
 const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt } = require('graphql');
 const { GraphQLDate } = require('graphql-iso-date');
-// const sourceProviderType = require('./SourceProviderSchema').sourceProviderType;
-// const categoryType = require('./CategorySchema').categoryType;
-const postContentType = require('./PostContentObject').type;
 
-class PostObject {
+class SourceObject {
   constructor()
   {
     this.type = new GraphQLObjectType({
-      name: 'PostType',
+      name: 'SourceType',
       fields: {
         id: {
           type: GraphQLInt
@@ -16,28 +13,16 @@ class PostObject {
         uid: {
           type: GraphQLString
         },
-        // source_provider: {
-        //   type: sourceProviderType
-        // },
-        source_provider: {
+        source_provider_uid: {
           type: GraphQLString
         },
-        category: {
+        name: {
           type: GraphQLString
-        },
-        // category: {
-        //   type: categoryType
-        // },
-        title: {
-          type: GraphQLString
-        },
-        description: {
-          type: GraphQLString
-        },
-        content: {
-          type: postContentType
         },
         url: {
+          type: GraphQLString
+        },
+        category_suggested: {
           type: GraphQLString
         },
         date: {
@@ -47,35 +32,39 @@ class PostObject {
     });
 
     this.query = new GraphQLObjectType({
-      name: 'PostQuery',
+      name: 'SourceQuery',
       fields: {
-        post: {
+        sourceProvider: {
           type: this.type,
           args: {
-            id: { type: GraphQLInt }
+            uid: { type: GraphQLInt },
+            email: { type: GraphQLString },
+            password: { type: GraphQLString }
           },
-          resolve: (source, {id}) => {
-            console.log('RUN A!');
-
-            return {
-
-            };
-          }
-        },
-        posts: {
-          type: new GraphQLList(this.type),
-          resolve: () => {
+          resolve: (args) => {
             return new Promise((resolve, reject) => {
-              this.db.all(`SELECT * FROM posts;`, function(err, result) {
+              this.db.all(`SELECT * FROM sources WHERE uid = (?) OR name LIKE %(?)%;`, [ args.uid, args.name ], function(err, result) {
                 if (err) {
                   reject(null);
                 }
 
-                console.log(result);
+                resolve(result[0]);
+              });
+            });
+          }
+        },
+        sourceProviders: {
+          type: new GraphQLList(this.type),
+          resolve: () => {
+            return new Promise((resolve, reject) => {
+              this.db.all(`SELECT * FROM sources;`, function(err, result) {
+                if (err) {
+                  reject(null);
+                }
 
                 resolve(result);
               });
-            })
+            });
           }
         }
       }
@@ -92,4 +81,4 @@ class PostObject {
   }
 }
 
-module.exports = new PostObject();
+module.exports = new SourceObject();
