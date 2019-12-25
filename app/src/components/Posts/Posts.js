@@ -39,8 +39,12 @@ export default class Posts extends React.Component {
         schema: 'post',
         query: `{
           posts {
+            uid,
             title,
-            source_provider,
+            source_provider {
+              uid,
+              name
+            },
             description,
             url,
             date

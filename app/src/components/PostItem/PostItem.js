@@ -21,7 +21,7 @@ export default class PostItem extends Component
           <div className="post-item__logo">
             <IconPostLogo />
           </div>
-          <span className="post-item__provider">{ this.state.source_provider }</span>
+          <span className="post-item__provider">{ this.state.source_provider.name }</span>
         </header>
         <h1 className="post-item__title">{ this.state.title }</h1>
         <div className="post-item__description">
