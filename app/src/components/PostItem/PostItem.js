@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
 
 import { ReactComponent as IconPostLogo } from '../../assets/icons/hexagon.svg';
 
 import './PostItem.scss';
+
+dayjs.extend(relativeTime);
 
 export default class PostItem extends Component
 {
@@ -11,6 +15,7 @@ export default class PostItem extends Component
     super(props);
 
     this.state = props.data;
+    this.state.dateClean = dayjs(this.state.date).fromNow();
   }
 
   render()
@@ -28,7 +33,7 @@ export default class PostItem extends Component
           <p>{ this.state.description }</p>
         </div>
         <aside className="post-item__meta">
-          <time className="post-item__date">{ this.state.date }</time>
+          <time className="post-item__date" dateTime={ this.state.date }>{ this.state.dateClean }</time>
         </aside>
       </div>
       <div className="post-item__thumbnail"></div>

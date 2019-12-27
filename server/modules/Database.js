@@ -1,9 +1,12 @@
 const sqlite3 = require('sqlite3').verbose();
-const PostObject = require('../objects/PostObject');
-const PostContentObject = require('../objects/PostContentObject');
-const UserObject = require('../objects/UserObject');
-const SourceProviderObject = require('../objects/SourceProviderObject');
-const SourceObject = require('../objects/SourceObject');
+const { mergeSchemas } = require('graphql-tools');
+const requiredObjects = [
+  '../objects/Post',
+  '../objects/PostContent',
+  '../objects/User',
+  '../objects/SourceProvider',
+  '../objects/Source'
+];
 
 class Database
 {
@@ -22,48 +25,54 @@ class Database
   {
     // Set up the tables
     const tableSchemas = [`
-      CREATE TABLE IF NOT EXISTS posts (
-        id integer PRIMARY KEY,
-        uid text,
-        title text,
-        description text,
-        date text,
-        source_provider text
-      );
+      CREATE TABLE IF NOT EXISTS "posts" (
+        "id" integer,
+        "uid" text,
+        "guid" text,
+        "title" text,
+        "description" text,
+        "date" text,
+        "source_provider_uid" text,
+        "source_uid" text,
+        PRIMARY KEY("id"),
+        UNIQUE("guid","title","date")
+      )
     `,`
-      CREATE TABLE IF NOT EXISTS source_providers (
-        id integer PRIMARY KEY,
-        uid text,
-        name text,
-        date text
-      );
+      CREATE TABLE IF NOT EXISTS "source_providers" (
+        "id" integer,
+        "uid" text,
+        "name" text,
+        "date" text,
+        PRIMARY KEY("id")
+      )
     `,`
-      CREATE TABLE IF NOT EXISTS sources (
-        id integer PRIMARY KEY,
-        uid text,
-        provider_uid text,
-        name text,
-        url text,
-        category_suggested text,
-        date text
-      );
+      CREATE TABLE IF NOT EXISTS "sources" (
+        "id" integer,
+        "uid" text,
+        "source_provider_uid" text,
+        "name" text,
+        "url" text,
+        "category_suggested" text,
+        "date" text,
+        PRIMARY KEY("id")
+      )
     `,`
-      CREATE TABLE IF NOT EXISTS users (
-        id integer PRIMARY KEY,
-        uid text,
-        firstname text,
-        lastname text,
-        email text,
-        password text,
-        date text
-      );
+      CREATE TABLE IF NOT EXISTS "subscriptions" (
+        "id" integer PRIMARY KEY,
+        "uid" text,
+        "user_uid" text,
+        "source_uid" text
+      )
     `,`
-      CREATE TABLE IF NOT EXISTS subscriptions (
-        id integer PRIMARY KEY,
-        uid text,
-        user_uid text,
-        source_uid text
-      );
+      CREATE TABLE IF NOT EXISTS "users" (
+        "id" integer PRIMARY KEY,
+        "uid" text,
+        "firstname" text,
+        "lastname" text,
+        "email" text,
+        "password" text,
+        "date" text
+      )
     `];
 
     tableSchemas.forEach(schema => {
@@ -75,19 +84,19 @@ class Database
 
   initSchemas()
   {
-    PostObject.bindDatabase(this.instance);
-    PostContentObject.bindDatabase(this.instance);
-    UserObject.bindDatabase(this.instance);
-    SourceProviderObject.bindDatabase(this.instance);
-    SourceObject.bindDatabase(this.instance);
+    const schemas = [];
 
-    this.schemas = {
-      post: PostObject.schema,
-      postContent: PostContentObject.schema,
-      user: UserObject.schema,
-      source_provider: SourceProviderObject.schema,
-      source: SourceObject.schema
-    };
+    requiredObjects.forEach(objectUrl => {
+      const object = require(objectUrl);
+
+      object.bindDatabase(this.instance);
+
+      schemas.push(object.schema);
+    })
+
+    this.schema = mergeSchemas({
+      schemas
+    });
   }
 }
 

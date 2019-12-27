@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useReducer } from 'react'
 import nanoid from 'nanoid';
 import Socket from './Socket';
 
@@ -12,10 +12,12 @@ export class ApiContextProvider extends React.Component
   {
     super(props);
 
-    let webSocketUrl = this.props.webSocketUrl || `ws://${ window.location.hostname }:8080`;
+    this.socket = React.createRef();
 
     this.state = {
       cache: {},
+      socket: this.socket.current,
+      webSocketUrl: this.props.webSocketUrl || `ws://${ window.location.hostname }:8080`,
       connected: false,
       authenticated: false,
       setConnection: (status) => {
@@ -47,11 +49,6 @@ export class ApiContextProvider extends React.Component
       subscriptions: {},
       setState: this.setState.bind(this)
     };
-
-    this.state.socket = new Socket(webSocketUrl, {
-      open: this.state.setConnection.bind(this, true),
-      message: this.parseMessage.bind(this)
-    });
   }
 
   parseMessage(event = { data: '[]' })
@@ -74,13 +71,20 @@ export class ApiContextProvider extends React.Component
 
   render()
   {
-    if (!this.state.connected) {
-      return <SplashScreen></SplashScreen>;
-    }
-
     return (
       <ApiContext.Provider value={ this.state }>
-        { this.props.children }
+        <Socket
+          ref={ this.socket }
+          url={ this.state.webSocketUrl }
+          callbacks={{
+            open: this.state.setConnection.bind(this, true),
+            message: this.parseMessage.bind(this)
+          }}
+        />
+        { this.state.connected
+          ? this.props.children
+          : <SplashScreen />
+        }
       </ApiContext.Provider>
     );
   }

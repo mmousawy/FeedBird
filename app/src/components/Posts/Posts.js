@@ -53,7 +53,7 @@ export default class Posts extends React.Component {
         id: prevState.subscriptionId
       });
 
-      this.context.send(payload.pack());
+      this.context.socket.send(payload.pack());
 
       return prevState;
     });

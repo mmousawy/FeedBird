@@ -116,6 +116,10 @@
 .post-item__date {
   font-size: 1.2rem;
   opacity: .6;
+
+  &::first-letter {
+    text-transform: uppercase;
+  }
 }
 
 .post-item__thumbnail {

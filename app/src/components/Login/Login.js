@@ -97,7 +97,7 @@ export default class Login extends Component
       id: this.state.subscriptionId
     });
 
-    this.context.send(payload.pack());
+    this.context.socket.send(payload.pack());
 
     event.preventDefault();
   }

@@ -1,0 +1,9 @@
+.notifications-overlay {
+  z-index: 2;
+  position: fixed;
+  top: 6.4rem;
+  right: 1.6rem;
+  left: 1.6rem;
+  bottom: 6.4rem;
+  pointer-events: none;
+}

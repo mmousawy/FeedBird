@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "graphql-iso-date": "^3.6.1",
+    "graphql-tools": "^4.0.6",
+    "nanoid": "^2.1.8",
     "rss-parser": "^3.7.3",
     "sqlite3": "^4.1.1",
     "ws": "^7.2.0"
