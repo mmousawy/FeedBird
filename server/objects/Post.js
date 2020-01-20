@@ -80,15 +80,12 @@ class PostObject {
         return new Promise((resolve, reject) => {
           const uid = nanoid(8);
 
-          this.db.all(`INSERT OR IGNORE INTO posts (uid, guid, title, description, date, source_provider_uid, source_uid) VALUES (?, ?, ?, ?, ?, ?, ?);`, [ uid, args.guid, args.title, args.description, args.date, args.source_provider_uid, args.source_uid ], (err, result) => {
+          this.db.all(`INSERT OR IGNORE INTO posts (uid, guid, title, description, date, url, source_provider_uid, source_uid) VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, [ uid, args.guid, args.title, args.description, args.date, args.url, args.source_provider_uid, args.source_uid ], (err, result) => {
             if (err) {
               reject(null);
             }
 
-            console.log(args);
-
-            this.db.get(`SELECT last_insert_rowid() as id`, (err, row) => {
-              console.log(row);
+            this.db.get(`SELECT id FROM post WHERE uid = ?`, [ args.uid ], (err, row) => {
               resolve({
                 uid: uid,
                 guid: args.guid,
@@ -98,6 +95,34 @@ class PostObject {
                 source_provider_uid: args.source_provider_uid,
                 source_uid: args.source_uid
               });
+            });
+          });
+        });
+      },
+      updatePost: (parent, args, context, info) => {
+        return new Promise((resolve, reject) => {
+          this.db.all(`UPDATE posts SET
+            title = coalesce(?, title),
+            description = coalesce(?, description),
+            text = coalesce(?, text),
+            date = coalesce(?, date),
+            url = coalesce(?, url)
+            WHERE url = ?;`,
+            [ args.title, args.description, args.text, args.date, args.url, args.url ], (err, result) => {
+            if (err) {
+              console.log(err);
+              reject(null);
+            }
+
+            console.log(args);
+
+            this.db.get(`SELECT * FROM posts WHERE url = ?`, [ args.url ], (err, row) => {
+              if (err) {
+                console.log(err);
+                reject(null);
+              }
+
+              resolve(row);
             });
           });
         });
@@ -150,6 +175,27 @@ class PostObject {
             }
           },
           resolve: this.resolvers.createPost
+        },
+        updatePost: {
+          type: this.type,
+          args: {
+            title: {
+              type: GraphQLString
+            },
+            description: {
+              type: GraphQLString
+            },
+            text: {
+              type: GraphQLString
+            },
+            date: {
+              type: GraphQLString
+            },
+            url: {
+              type: GraphQLString
+            }
+          },
+          resolve: this.resolvers.updatePost
         }
       }
     });

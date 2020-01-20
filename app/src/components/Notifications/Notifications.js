@@ -1,4 +1,5 @@
 import React from 'react';
+import nanoid from 'nanoid';
 import NotificationItem from '../NotificationItem/NotificationItem';
 
 import './Notifications.scss';
@@ -22,7 +23,7 @@ export class Notifications extends React.Component
 
   addNotification(message)
   {
-    const messageId = (new Date()).toISOString();
+    const messageId = nanoid(5);
 
     this.setState(prevState => {
       prevState.notifications = [
